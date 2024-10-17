@@ -1,31 +1,31 @@
+// app/movies/page.js
+
 async function getMovies() {
   const query = `
-  query getMovies {
-    movies {
-      nodes {
-        movieFields {
-          
-         
-          movieQuote
+    query getMovies {
+      movies {
+        nodes {
+          movieFields {
+            movieQuote
+          }
+          title
+          uri
         }
-        title
-        uri
       }
     }
-  }
   `;
 
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}?query=${encodeURIComponent(
       query
     )}`,
-    { next: { revalidate: 10 } },
     {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        // ... any other headers you need to include (like authentication tokens)
+        // Include any authentication tokens or other headers here
       },
+      cache: "no-store", // Ensures SSR by not caching the response
     }
   );
 
@@ -40,8 +40,7 @@ export default async function MovieList() {
   return (
     <div>
       {movies.map((movie) => {
-        // Ensure that you are accessing the movieQuote from the movie.movieFields object
-        const { movieFields: { movieQuote, title } = {} } = movie;
+        const { movieFields: { movieQuote } = {} } = movie;
         return (
           <div key={movie.uri} className="card">
             <h3>{movie.title}</h3>
